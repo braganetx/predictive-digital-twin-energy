@@ -1,0 +1,170 @@
+{
+  "section_5_1_forecasting_table": {
+    "occupancy": {
+      "H4": {
+        "SARIMA": {
+          "MAE": 549.95,
+          "RMSE": 590.34
+        },
+        "Prophet": {
+          "MAE": 513.98,
+          "RMSE": 531.84
+        },
+        "LSTM": {
+          "MAE": 1510.1,
+          "RMSE": 1991.42
+        }
+      },
+      "H8": {
+        "SARIMA": {
+          "MAE": 560.23,
+          "RMSE": 616.86
+        },
+        "Prophet": {
+          "MAE": 513.98,
+          "RMSE": 541.1
+        },
+        "LSTM": {
+          "MAE": 1544.13,
+          "RMSE": 1970.02
+        }
+      },
+      "H16": {
+        "SARIMA": {
+          "MAE": 580.79,
+          "RMSE": 714.0
+        },
+        "Prophet": {
+          "MAE": 513.98,
+          "RMSE": 595.0
+        },
+        "LSTM": {
+          "MAE": 1568.47,
+          "RMSE": 2005.01
+        }
+      }
+    },
+    "temperature": {
+      "H4": {
+        "SARIMA": {
+          "MAE": 0.68,
+          "RMSE": 0.84
+        },
+        "Prophet": {
+          "MAE": 0.64,
+          "RMSE": 0.75
+        },
+        "LSTM": {
+          "MAE": 4.61,
+          "RMSE": 5.32
+        }
+      },
+      "H8": {
+        "SARIMA": {
+          "MAE": 0.7,
+          "RMSE": 0.89
+        },
+        "Prophet": {
+          "MAE": 0.64,
+          "RMSE": 0.78
+        },
+        "LSTM": {
+          "MAE": 4.67,
+          "RMSE": 5.33
+        }
+      },
+      "H16": {
+        "SARIMA": {
+          "MAE": 0.72,
+          "RMSE": 0.95
+        },
+        "Prophet": {
+          "MAE": 0.64,
+          "RMSE": 0.79
+        },
+        "LSTM": {
+          "MAE": 4.79,
+          "RMSE": 5.46
+        }
+      }
+    },
+    "building_load": {
+      "H4": {
+        "SARIMA": {
+          "MAE": 11.36,
+          "RMSE": 14.13
+        },
+        "Prophet": {
+          "MAE": 10.62,
+          "RMSE": 12.73
+        },
+        "LSTM": {
+          "MAE": 193.0,
+          "RMSE": 222.61
+        }
+      },
+      "H8": {
+        "SARIMA": {
+          "MAE": 11.57,
+          "RMSE": 15.24
+        },
+        "Prophet": {
+          "MAE": 10.62,
+          "RMSE": 13.37
+        },
+        "LSTM": {
+          "MAE": 165.79,
+          "RMSE": 201.22
+        }
+      },
+      "H16": {
+        "SARIMA": {
+          "MAE": 12.0,
+          "RMSE": 17.67
+        },
+        "Prophet": {
+          "MAE": 10.62,
+          "RMSE": 14.73
+        },
+        "LSTM": {
+          "MAE": 153.95,
+          "RMSE": 188.75
+        }
+      }
+    }
+  },
+  "section_5_2_H1": {
+    "E_reactive_kwh": 1004559.2,
+    "E_predictive_kwh": 862279.1,
+    "delta_E_building_kwh": 142280.1,
+    "eta_energy_percent": 14.16,
+    "wilcoxon_W": 0.0,
+    "wilcoxon_p_one_sided": 0.0,
+    "bootstrap_ci_lower_pct": 14.0,
+    "bootstrap_ci_upper_pct": 14.47,
+    "H1_accepted": true
+  },
+  "section_5_3_H2": {
+    "E_comp_joules": 51764.6,
+    "E_comp_kwh": 0.01438,
+    "rho_overhead_pct": 0.00001,
+    "delta_E_net_kwh": 142280.08,
+    "breakdown_joules": {
+      "data_pipeline": 20.5,
+      "lstm_inference": 328.1,
+      "thermal_simulation": 35.5,
+      "optimization": 51380.5
+    },
+    "H2_accepted": true,
+    "mean_nsga2_time_s": 1.37,
+    "mean_moead_time_s": 2.694
+  },
+  "section_5_4_H3": {
+    "operating_hours_total": 640.0,
+    "qos_baseline_pct": 99.77,
+    "qos_predictive_pct": 96.91,
+    "violation_hours_baseline": 1.5,
+    "violation_hours_predictive": 19.8,
+    "H3_accepted": true
+  }
+}

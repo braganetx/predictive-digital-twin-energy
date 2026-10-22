@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: digital-twin-config
+  namespace: digital-twin-system
+data:
+  SIM_DAYS: "56"
+  SAMPLING_MINUTES: "15"
+  THERMAL_ZONES: "4"
+  GLA_SQM: "45000"
+  OPTIMIZER_POP_SIZE: "80"
+  OPTIMIZER_GENERATIONS: "35"
+  TARGET_COMFORT_MIN: "22.0"
+  TARGET_COMFORT_MAX: "24.0"

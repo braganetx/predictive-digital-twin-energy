@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  digital-twin-simulation:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: braganetx/predictive-digital-twin-energy:latest
+    container_name: digital_twin_sim
+    volumes:
+      - ./outputs:/app/outputs
+    environment:
+      - PYTHONUNBUFFERED=1
+      - MPLCONFIGDIR=/tmp/matplotlib
+    command: python main.py

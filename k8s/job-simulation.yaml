@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: digital-twin-benchmark-job
+  namespace: digital-twin-system
+  labels:
+    app.kubernetes.io/name: digital-twin-simulation
+    benchmark: commercial-building-efficiency
+spec:
+  ttlSecondsAfterFinished: 3600
+  backoffLimit: 2
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: digital-twin-simulation
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: digital-twin-solver
+          image: braganetx/predictive-digital-twin-energy:latest
+          imagePullPolicy: IfNotPresent
+          command: ["python", "main.py"]
+          resources:
+            requests:
+              cpu: "2"
+              memory: "4Gi"
+            limits:
+              cpu: "4"
+              memory: "8Gi"
+          envFrom:
+            - configMapRef:
+                name: digital-twin-config
+          env:
+            - name: MPLCONFIGDIR
+              value: "/tmp/matplotlib"
+          volumeMounts:
+            - name: simulation-outputs
+              mountPath: /app/outputs
+      volumes:
+        - name: simulation-outputs
+          emptyDir: {}

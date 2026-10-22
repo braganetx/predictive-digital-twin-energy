@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you utilize this benchmark, dataset synthesis, or digital twin software, please cite the corresponding SSRN Elsevier research paper."
+title: "Predictive Digital Twin with Hardware-Aware Multi-Objective Optimization for Commercial Building Energy Efficiency"
+authors:
+  - family-names: "Braga"
+    given-names: "Adão de Jesus"
+    affiliation: "Eletriza360 Negócios Digitais"
+    email: "braganetx@gmail.com"
+repository-code: "https://github.com/braganetx/predictive-digital-twin-energy"
+doi: "10.2139/ssrn.7645518"
+date-released: "2026-10-20"
+license: "MIT"
+keywords:
+  - "digital twin"
+  - "energy efficiency"
+  - "hardware-aware"
+  - "green ai"
+  - "multi-objective optimization"
+  - "kubernetes"
+  - "nsga-ii"
