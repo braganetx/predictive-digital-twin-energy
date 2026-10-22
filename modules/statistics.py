@@ -1,32 +1,66 @@
-# modules/statistics.py
+"""
+modules/statistics.py — Non-Parametric Hypothesis Testing & Quality-of-Service (QoS) Validation.
+Implements the Wilcoxon signed-rank test and 10,000-sample bootstrap confidence intervals
+to validate statistical significance without assuming normal distribution.
+"""
+from typing import Dict, Any, Tuple, Callable
 import numpy as np
-from scipy import stats
-from config import T_COMFORT_LOW, T_COMFORT_HIGH
+import pandas as pd
+from scipy.stats import wilcoxon
+from config import ALPHA, N_BOOTSTRAP, T_COMFORT_LOW, T_COMFORT_HIGH
 
-def run_wilcoxon_test(daily_reactive: np.ndarray, daily_predictive: np.ndarray) -> dict:
-    """
-    Teste de Wilcoxon pareado de postos sinalizados (N=56 dias).
-    Verifica se a reducao de consumo do preditivo e estatisticamente significativa.
-    """
-    differences = daily_reactive - daily_predictive
-    stat_two, p_two = stats.wilcoxon(differences, alternative="two-sided")
-    stat_one, p_one = stats.wilcoxon(differences, alternative="greater")
 
+def run_wilcoxon_test(daily_baseline: np.ndarray,
+                      daily_predictive: np.ndarray,
+                      alpha: float = ALPHA) -> Dict[str, Any]:
+    """
+    Executes a one-sided paired Wilcoxon signed-rank test to determine whether
+    daily predictive facility consumption is systematically lower than conventional baseline.
+    
+    H0: Median paired difference (Baseline - Predictive) <= 0
+    H1: Median paired difference (Baseline - Predictive) > 0
+    
+    Args:
+        daily_baseline: Vector of daily baseline electricity consumption [kWh].
+        daily_predictive: Vector of daily predictive electricity consumption [kWh].
+        alpha: Statistical significance threshold (default: 0.05).
+        
+    Returns:
+        Dict[str, Any]: Test statistics, p-values, and formal hypothesis decision.
+    """
+    diff = daily_baseline - daily_predictive
+    res = wilcoxon(diff, alternative="greater")
     return {
-        "W_statistic": round(float(stat_two), 2),
-        "p_value_two_sided": round(float(p_two), 6),
-        "p_value_one_sided": round(float(p_one), 8),
-        "n_pairs": len(differences),
-        "reject_H0": bool(p_one < 0.05),
-        "mean_diff_kwh": round(float(np.mean(differences)), 2),
-        "median_diff_kwh": round(float(np.median(differences)), 2),
+        "W_statistic": float(res.statistic),
+        "p_value_one_sided": float(res.pvalue),
+        "reject_H0": bool(res.pvalue < alpha),
+        "alpha": alpha,
+        "n_samples": len(diff),
     }
 
 
-def bootstrap_ci(data: np.ndarray, stat_fn=np.mean, n_iter: int = 10000, alpha: float = 0.05, seed: int = 42) -> tuple:
+def bootstrap_ci(data: np.ndarray,
+                 stat_fn: Callable = np.mean,
+                 n_iter: int = N_BOOTSTRAP,
+                 alpha: float = ALPHA,
+                 seed: int = 42) -> Tuple[float, float, float]:
+    """
+    Computes non-parametric percentile bootstrap confidence intervals at (1 - alpha) level.
+    
+    Args:
+        data: Array of sample observations.
+        stat_fn: Statistical function to evaluate (default: np.mean).
+        n_iter: Number of bootstrap iterations (default: 10,000).
+        alpha: Significance level (default: 0.05 for 95% CI).
+        seed: Random seed for deterministic reproducibility.
+        
+    Returns:
+        Tuple[float, float, float]: (lower_bound, upper_bound, sample_mean).
+    """
     rng = np.random.default_rng(seed)
+    n = len(data)
     stats_boot = np.array([
-        stat_fn(rng.choice(data, size=len(data), replace=True))
+        stat_fn(rng.choice(data, size=n, replace=True))
         for _ in range(n_iter)
     ])
     lower = float(np.percentile(stats_boot, 100 * alpha / 2))
@@ -34,10 +68,20 @@ def bootstrap_ci(data: np.ndarray, stat_fn=np.mean, n_iter: int = 10000, alpha: 
     return lower, upper, float(stat_fn(data))
 
 
-def compute_qos(T_history: np.ndarray, dataset) -> dict:
+def compute_qos(T_history: np.ndarray, dataset: pd.DataFrame) -> Dict[str, Any]:
     """
-    Calcula QoS de conforto termico durante as horas de funcionamento.
-    QoS = % de passos operacionais dentro de [22°C, 24°C] em todas as 4 zonas.
+    Computes the Thermal Comfort Quality-of-Service (QoS) satisfaction metric
+    during commercial operating hours across all 4 building zones.
+    
+    QoS = percentage of operating 15-minute intervals where all zones
+    remain strictly within the ASHRAE Standard 55 comfort band [22.0°C, 24.0°C].
+    
+    Args:
+        T_history: Simulated temperature trajectories of shape (N_STEPS, N_ZONES).
+        dataset: Telemetry DataFrame containing commercial schedule masks.
+        
+    Returns:
+        Dict[str, Any]: QoS percentage and thermal discomfort violation hours.
     """
     operating_mask = dataset["is_open"].values.astype(bool)
     T_op = T_history[operating_mask]

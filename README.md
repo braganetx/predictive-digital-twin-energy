@@ -102,17 +102,27 @@ The framework operates across five coordinated autonomic phases:
    cd predictive-digital-twin-energy
    ```
 
+### Option A: Local Python Environment (Recommended)
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/braganetx/predictive-digital-twin-energy.git
+   cd predictive-digital-twin-energy
+   ```
+
 2. **Create virtual environment and install dependencies:**
    ```bash
    python3 -m venv venv
    source venv/bin/activate
-   pip install --upgrade pip
-   pip install -r requirements.txt
+   make install
+   # Or install in editable scientific development mode:
+   # pip install -e ".[dev]"
    ```
 
 3. **Execute the complete benchmark simulation:**
    ```bash
-   python main.py
+   make run
+   # Or: python main.py / digital-twin-sim
    ```
    *Execution time: ~2 minutes on standard 4-core CPU. Generates high-resolution figures in `outputs/figures/` and full empirical records in `outputs/paper_results.json`.*
 
@@ -123,7 +133,8 @@ The framework operates across five coordinated autonomic phases:
 Run the fully containerized suite without managing local Python libraries:
 
 ```bash
-docker compose up --build
+make docker-run
+# Or: docker compose up --build
 ```
 The generated outputs will be automatically synchronized into your host `./outputs/` directory.
 
@@ -134,16 +145,15 @@ The generated outputs will be automatically synchronized into your host `./outpu
 To execute the digital twin simulation within a localized Kubernetes cluster (Minikube, Kind, or MicroK8s) governed by resource quotas and cgroups v2 isolation (as described in Section 4.1 of the paper):
 
 ```bash
-# 1. Apply namespace and resource quotas
-kubectl apply -f k8s/namespace.yaml
+# Deploy namespace, configmap, and batch simulation job in one step:
+make k8s-apply
 
-# 2. Deploy experiment configuration
-kubectl apply -f k8s/configmap.yaml
+# Or manually:
+# kubectl apply -f k8s/namespace.yaml
+# kubectl apply -f k8s/configmap.yaml
+# kubectl apply -f k8s/job-simulation.yaml
 
-# 3. Trigger the batch simulation job
-kubectl apply -f k8s/job-simulation.yaml
-
-# 4. Stream solver execution logs
+# Stream solver execution logs
 kubectl logs -n digital-twin-system -l app.kubernetes.io/name=digital-twin-simulation -f
 ```
 
@@ -154,7 +164,8 @@ kubectl logs -n digital-twin-system -l app.kubernetes.io/name=digital-twin-simul
 This project includes a comprehensive verification test suite covering physical conservation laws, optimization bounds, statistical integrity, and hypothesis validation:
 
 ```bash
-python -m unittest discover -s tests -v
+make test
+# Or: python -m unittest discover -s tests -v
 ```
 
 Output:
@@ -182,15 +193,20 @@ Ran 12 tests in 0.016s — OK
 ```
 predictive-digital-twin-energy/
 ├── .github/
-│   └── workflows/
-│       └── ci.yml                 # Automated GitHub Actions validation pipeline
+│   ├── workflows/
+│   │   └── ci.yml                 # Automated multi-environment GitHub Actions CI
+│   └── ISSUE_TEMPLATE/            # Standardized bug and research extension templates
 ├── config.py                      # Physical constants (ASHRAE 55, ISO 7730, Clarke 2001)
 ├── main.py                        # Executable benchmark entry point
+├── pyproject.toml                 # Modern PEP 517/518/621 package & metadata specification
+├── Makefile                       # Developer and researcher task automation
 ├── requirements.txt               # Pinned Python package specifications
 ├── Dockerfile                     # Multi-stage reproducible container image
 ├── docker-compose.yml             # Single-command local container orchestration
 ├── CITATION.cff                   # Machine-readable GitHub citation metadata
 ├── LICENSE                        # MIT Open Source License
+├── CONTRIBUTING.md                # Scientific reproducibility & contribution guidelines
+├── SECURITY.md                    # Vulnerability reporting & responsible disclosure
 ├── k8s/                           # Kubernetes workload orchestration manifests
 │   ├── namespace.yaml             # Dedicated namespace & ResourceQuota isolation
 │   ├── configmap.yaml             # Thermodynamic and horizon configurations

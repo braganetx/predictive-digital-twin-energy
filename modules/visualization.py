@@ -1,14 +1,26 @@
-# modules/visualization.py
+"""
+modules/visualization.py — Publication-Grade Figure Generation Routines.
+Renders 300-DPI publication figures adhering to IEEE/Elsevier formatting guidelines.
+"""
+from typing import Optional
+import os
 import numpy as np
+import pandas as pd
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import os
 
-OUTPUT_DIR = "outputs/figures"
+OUTPUT_DIR: str = "outputs/figures"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-def plot_figure1_energy_comparison(daily_reactive, daily_predictive, eta_energy: float):
+
+def plot_figure1_energy_comparison(daily_reactive: np.ndarray,
+                                   daily_predictive: np.ndarray,
+                                   eta_energy: float) -> str:
+    """
+    Renders Figure 1: Daily Electrical Energy Consumption Comparison (56-Day Evaluation).
+    Includes cumulative savings fill and daily difference bar chart.
+    """
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(11, 6.5), sharex=True)
     days = np.arange(1, len(daily_reactive) + 1)
 
@@ -35,10 +47,19 @@ def plot_figure1_energy_comparison(daily_reactive, daily_predictive, eta_energy:
     path = os.path.join(OUTPUT_DIR, "figure1_energy_comparison.png")
     plt.savefig(path, dpi=300, bbox_inches="tight")
     plt.close()
-    print(f"[OK] Figure 1 saved to: {path}")
+    return path
 
 
-def plot_figure2_zone_temperatures(T_reactive, T_predictive, dataset, zone_idx: int = 2, day_start: int = 14, n_days: int = 3):
+def plot_figure2_zone_temperatures(T_reactive: np.ndarray,
+                                   T_predictive: np.ndarray,
+                                   dataset: pd.DataFrame,
+                                   zone_idx: int = 2,
+                                   day_start: int = 14,
+                                   n_days: int = 3) -> str:
+    """
+    Renders Figure 2: Indoor Thermal Trajectory in Specific Thermal Zone (Food Court).
+    Demonstrates proactive pre-cooling and avoidance of reactive overshooting.
+    """
     from config import T_COMFORT_LOW, T_COMFORT_HIGH, STEPS_PER_DAY
     s0 = day_start * STEPS_PER_DAY
     s1 = s0 + n_days * STEPS_PER_DAY
@@ -69,10 +90,16 @@ def plot_figure2_zone_temperatures(T_reactive, T_predictive, dataset, zone_idx: 
     path = os.path.join(OUTPUT_DIR, "figure2_zone_temperatures.png")
     plt.savefig(path, dpi=300, bbox_inches="tight")
     plt.close()
-    print(f"[OK] Figure 2 saved to: {path}")
+    return path
 
 
-def plot_figure3_pareto_front(nsga2_F: np.ndarray, moead_F: np.ndarray, knee_F: np.ndarray):
+def plot_figure3_pareto_front(nsga2_F: np.ndarray,
+                              moead_F: np.ndarray,
+                              knee_F: np.ndarray) -> str:
+    """
+    Renders Figure 3: Non-Dominated Pareto Frontiers Derived by NSGA-II and MOEA/D.
+    Highlights the autonomic knee point dispatch compromise setpoint.
+    """
     fig, ax = plt.subplots(figsize=(8.5, 5.5))
 
     idx_n = np.argsort(nsga2_F[:, 0])
@@ -99,4 +126,4 @@ def plot_figure3_pareto_front(nsga2_F: np.ndarray, moead_F: np.ndarray, knee_F: 
     path = os.path.join(OUTPUT_DIR, "figure3_pareto_front.png")
     plt.savefig(path, dpi=300, bbox_inches="tight")
     plt.close()
-    print(f"[OK] Figure 3 saved to: {path}")
+    return path
